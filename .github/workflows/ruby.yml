@@ -13,8 +13,14 @@ jobs:
       uses: actions/setup-ruby@v1
       with:
         ruby-version: 2.6.x
+    - name: Cache bundle
+      uses: actions/cache@preview
+      with:
+        path: ${{ format('{0}{1}', github.workspace, '/yarn.lock') }}
+        key: ${{ runner.os }}-${{ github.repository }}-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
+        restore-keys: ${{ runner.os }}-${{ github.repository }}
     - name: Build and test with Rake
       run: |
         gem install bundler
-        bundle install --jobs 4 --retry 3
+        bundle install --jobs 4 --retry 3 --path ${{ format('{0}{1}', github.workspace, '/yarn.lock') }}
         bundle exec rake
