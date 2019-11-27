@@ -17,7 +17,7 @@ jobs:
       uses: actions/cache@preview
       with:
         path: ${{ format('{0}{1}', github.workspace, '/vendor/bundle') }}
-        key: ${{ runner.os }}-${{ github.repository }}-${{ hashFiles(format('{0}{1}', github.workspace, '/Gemfile.lock')) }}
+        key: ${{ runner.os }}-${{ github.repository }}
         restore-keys: ${{ runner.os }}-${{ github.repository }}
     - name: Build and test with Rake
       run: |
