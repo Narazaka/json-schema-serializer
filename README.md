@@ -1,8 +1,6 @@
 # Json::Schema::Serializer
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/json/schema/serializer`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+JSON Schema based serializer
 
 ## Installation
 
@@ -22,7 +20,49 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require "json/schema/serializer"
+
+schema = {
+  type: "object",
+  properties: {
+    id: { type: "integer" },
+    name: { type: "string" },
+  },
+}
+
+serializer = JSON::Schema::Serializer.new(schema)
+serializer.serialize({id: 42, name: "me", foo: "bar"})
+# => {"id"=>42, "name"=>"me"}
+```
+
+### Caution
+
+`JSON::Schema::Serializer` does not resolve `$ref` so use external resolver.
+
+with `json_refs` gem example:
+
+```ruby
+require "json_refs"
+require "json/schema/serializer"
+
+
+schema = {
+  "type" => "object",
+  "properties" => {
+    "foo" => { "type" => "integer" },
+    "bar" => { "$ref" => "#/properties/foo" },
+  },
+}
+
+serializer = JSON::Schema::Serializer.new(JsonRefs.(schema))
+serializer.serialize({foo: 0, bar: "42"})
+# => {"foo"=>0, "bar"=>42}
+```
+
+## License
+
+Zlib License
 
 ## Development
 
@@ -32,4 +72,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/json-schema-serializer.
+Bug reports and pull requests are welcome on GitHub at https://github.com/Narazaka/json-schema-serializer.
