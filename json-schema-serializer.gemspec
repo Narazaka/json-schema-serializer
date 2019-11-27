@@ -8,6 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Json::Schema::Serializer::VERSION
   spec.authors       = ["Narazaka"]
   spec.email         = ["info@narazaka.net"]
+  spec.licenses      = ['Zlib']
 
   spec.summary       = %q{JSON Schema based serializer}
   spec.homepage      = "https://github.com/Narazaka/json-schema-serializer"
