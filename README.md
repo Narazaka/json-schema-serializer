@@ -1,6 +1,6 @@
 # Json::Schema::Serializer
 
-[![Actions Status](https://github.com/Narazaka/json-schema-serializer/workflows/ruby/badge.svg)](https://github.com/Narazaka/json-schema-serializer/actions)
+[![Actions Status](https://github.com/Narazaka/json-schema-serializer/workflows/Ruby/badge.svg)](https://github.com/Narazaka/json-schema-serializer/actions)
 
 JSON Schema based serializer
 
