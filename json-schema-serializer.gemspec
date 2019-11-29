@@ -37,5 +37,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.5"
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "rspec-power_assert", "~> 1.1"
+  spec.add_development_dependency "rubocop", "~> 0.76"
+  spec.add_development_dependency "rubocop-airbnb", "~> 3"
   spec.add_development_dependency "pry-byebug", "~> 3.7"
 end
