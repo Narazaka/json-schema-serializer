@@ -32,11 +32,37 @@ schema = {
     id: { type: "integer" },
     name: { type: "string" },
   },
+  required: ["id"],
 }
 
 serializer = JSON::Schema::Serializer.new(schema)
-serializer.serialize({id: 42, name: "me", foo: "bar"})
+
+serializer.serialize({id: "42", name: "me", foo: "bar"})
 # => {"id"=>42, "name"=>"me"}
+# "42" -> 42! type coerced!
+
+serializer.serialize({})
+# => {"id"=>0, "name"=>nil}
+# nil -> 0! required property's type coerced!
+
+class A
+  def id
+    42
+  end
+end
+serializer.serialize(A.new)
+# => {"id"=>42, "name"=>nil}
+# method also allowed
+
+class Schema
+  def type
+    :string
+  end
+end
+serializer2 = JSON::Schema::Serializer.new(Schema.new)
+serializer2.serialize(32)
+# => "32"
+# non-hash schema allowed
 ```
 
 ### Caution
