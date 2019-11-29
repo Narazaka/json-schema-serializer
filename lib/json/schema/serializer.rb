@@ -5,24 +5,30 @@ require "set"
 module JSON
   class Schema
     class Serializer
-      def initialize(obj)
+      def initialize(obj, options = {})
         @schema = obj
+        @options = options
       end
 
       def serialize(obj)
-        Walker.walk(@schema, obj, true)
+        Walker.walk(@schema, obj, true, @options)
       end
 
       class Walker
         class << self
           TimeWithZone = defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : nil
 
-          def walk(schema, obj, required)
+          def walk(schema, obj, required, options)
             type = try_hash(schema, :type)
             default = try_hash(schema, :default)
             format = try_hash(schema, :format)
             obj = default if obj.nil?
-            type_coerce(schema, detect_type(type, obj), format, obj, required)
+            if options[:inject_key]
+              inject_key = try_hash(schema, options[:inject_key])
+              injector = try_hash(options[:injectors], inject_key) if inject_key
+              obj = injector.new(obj) if injector
+            end
+            type_coerce(schema, detect_type(type, obj), format, obj, required, options)
           end
 
           def detect_type(type, obj)
@@ -105,7 +111,7 @@ module JSON
             end
           end
 
-          def type_coerce(schema, type, format, obj, required)
+          def type_coerce(schema, type, format, obj, required, options)
             return nil if !required && obj.nil?
 
             case type.to_s
@@ -151,12 +157,12 @@ module JSON
               obj == true
             when "array"
               items_schema = try_hash(schema, :items)
-              obj.nil? ? [] : obj.map { |item| walk(items_schema, item, true) }
+              obj.nil? ? [] : obj.map { |item| walk(items_schema, item, true, options) }
             when "object"
               properties_schema = try_hash(schema, :properties)
               required_schema = Set.new(try_hash(schema, :required)&.map(&:to_s))
               properties_schema.map do |name, property_schema|
-                [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s))]
+                [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s), options)]
               end.to_h
             end
           end
