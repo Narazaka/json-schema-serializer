@@ -31,15 +31,22 @@ schema = {
   properties: {
     id: { type: "integer" },
     name: { type: "string" },
+    fuzzy: { type: ["string", "integer", "null"] },
   },
   required: ["id"],
 }
 
 serializer = JSON::Schema::Serializer.new(schema)
 
-serializer.serialize({id: "42", name: "me", foo: "bar"})
-# => {"id"=>42, "name"=>"me"}
+serializer.serialize({id: "42", name: "me", foo: "bar", fuzzy: "1000"})
+# => {"id"=>42, "name"=>"me", "fuzzy"=>"1000"}
 # "42" -> 42! type coerced!
+
+serializer.serialize({id: "42", name: "me", fuzzy: 42})
+# => {"id"=>42, "name"=>"me", "fuzzy"=>42}
+serializer.serialize({id: "42", name: "me"})
+# => {"id"=>42, "name"=>"me", "fuzzy"=>nil}
+# multiple type auto select!
 
 serializer.serialize({})
 # => {"id"=>0, "name"=>nil}
