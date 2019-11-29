@@ -9,54 +9,21 @@ class Inject
 end
 
 RSpec.describe JSON::Schema::Serializer do
-  let(:data) do
-    {
-      b: "ccc",
-    }
-  end
-
-  let(:options) do
-    {
-      inject_key: "injects",
-      injectors: {
-        Inject1: Inject,
-      },
-    }
-  end
-
   subject { JSON::Schema::Serializer.new(schema, options).serialize(data) }
 
+  let(:data) { { b: "ccc" } }
+
+  let(:options) { { inject_key: "injects", injectors: { Inject1: Inject } } }
+
   context "injected" do
-    let(:schema) do
-      {
-        type: "object",
-        injects: "Inject1",
-        properties: {
-          a: {
-            type: "string",
-          },
-        },
-      }
-    end
+    let(:schema) { { type: "object", injects: "Inject1", properties: { a: { type: "string" } } } }
 
     it_is_asserted_by { subject == { "a" => "ccc" } }
   end
 
   context "no injected" do
-    let(:schema) do
-      {
-        type: "object",
-        title: "Inject1",
-        properties: {
-          a: {
-            type: "string",
-          },
-        },
-      }
-    end
+    let(:schema) { { type: "object", title: "Inject1", properties: { a: { type: "string" } } } }
 
     it_is_asserted_by { subject == { "a" => nil } }
   end
-
-
 end

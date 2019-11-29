@@ -23,6 +23,7 @@ module JSON
             default = try_hash(schema, :default)
             format = try_hash(schema, :format)
             obj = default if obj.nil?
+
             if options[:inject_key]
               inject_key = try_hash(schema, options[:inject_key])
               injector = try_hash(options[:injectors], inject_key) if inject_key
