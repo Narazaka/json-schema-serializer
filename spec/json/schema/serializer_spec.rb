@@ -12,59 +12,77 @@ end
 RSpec.describe JSON::Schema::Serializer do
   describe "#serialize" do
     subject { JSON::Schema::Serializer.new(schema).serialize(data) }
+
     describe "string" do
       let(:schema) { { type: "string" } }
 
       context "from string" do
         let(:data) { "foobar" }
+
         it do
           is_asserted_by { subject == "foobar" }
         end
       end
+
       context "from int" do
         let(:data) { 42 }
+
         it do
           is_asserted_by { subject == "42" }
         end
       end
+
       context "from float" do
         let(:data) { 42.195 }
+
         it do
           is_asserted_by { subject == "42.195" }
         end
       end
+
       context "from boolean" do
         let(:data) { false }
+
         it do
           is_asserted_by { subject == "false" }
         end
       end
+
       context "from nil" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == "" }
         end
       end
+
       context "from array" do
         let(:data) { [] }
+
         it do
           is_asserted_by { subject == "[]" }
         end
       end
+
       context "from obj" do
         let(:data) { {} }
+
         it do
           is_asserted_by { subject == "{}" }
         end
       end
+
       context "from class" do
         let(:data) { Foo.new }
+
         it do
           is_asserted_by { subject =~ /#<Foo/ }
         end
       end
+
       context "from stringable class" do
         let(:data) { Stringable.new }
+
         it do
           is_asserted_by { subject == "Stringable" }
         end
@@ -77,30 +95,39 @@ RSpec.describe JSON::Schema::Serializer do
 
         context "from string" do
           let(:data) { "aaa" }
+
           it do
             is_asserted_by { subject == "aaa" }
           end
         end
+
         context "from null" do
           let(:data) { nil }
+
           it do
             is_asserted_by { subject == "" }
           end
         end
+
         context "from datetime" do
           let(:data) { DateTime.parse("2019-01-01T09:00:00+0900") }
+
           it do
             is_asserted_by { subject == "2019-01-01T09:00:00+09:00" }
           end
         end
+
         context "from time" do
           let(:data) { Time.parse("2019-01-01T09:00:00+0900") }
+
           it do
             is_asserted_by { subject == "2019-01-01T09:00:00+09:00" }
           end
         end
+
         context "from date" do
           let(:data) { Time.parse("2019-01-01T09:00:00+0900").to_date }
+
           it do
             is_asserted_by { subject == "2019-01-01T00:00:00+00:00" }
           end
@@ -112,30 +139,39 @@ RSpec.describe JSON::Schema::Serializer do
 
         context "from string" do
           let(:data) { "aaa" }
+
           it do
             is_asserted_by { subject == "aaa" }
           end
         end
+
         context "from null" do
           let(:data) { nil }
+
           it do
             is_asserted_by { subject == "" }
           end
         end
+
         context "from datetime" do
           let(:data) { DateTime.parse("2019-01-01T09:00:00+0900") }
+
           it do
             is_asserted_by { subject == "2019-01-01" }
           end
         end
+
         context "from time" do
           let(:data) { Time.parse("2019-01-01T09:00:00+0900") }
+
           it do
             is_asserted_by { subject == "2019-01-01" }
           end
         end
+
         context "from date" do
           let(:data) { Time.parse("2019-01-01T09:00:00+0900").to_date }
+
           it do
             is_asserted_by { subject == "2019-01-01" }
           end
@@ -147,30 +183,39 @@ RSpec.describe JSON::Schema::Serializer do
 
         context "from string" do
           let(:data) { "aaa" }
+
           it do
             is_asserted_by { subject == "aaa" }
           end
         end
+
         context "from null" do
           let(:data) { nil }
+
           it do
             is_asserted_by { subject == "" }
           end
         end
+
         context "from datetime" do
           let(:data) { DateTime.parse("2019-01-01T09:00:00+0900") }
+
           it do
             is_asserted_by { subject == "09:00:00+09:00" }
           end
         end
+
         context "from time" do
           let(:data) { Time.parse("2019-01-01T09:00:00+0900") }
+
           it do
             is_asserted_by { subject == "09:00:00+09:00" }
           end
         end
+
         context "from date" do
           let(:data) { Time.parse("2019-01-01T09:00:00+0900").to_date }
+
           it do
             is_asserted_by { subject == "00:00:00+00:00" }
           end
@@ -183,8 +228,9 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from nil" do
         let(:data) { nil }
+
         it do
-          is_asserted_by { subject == nil }
+          is_asserted_by { subject.nil? }
         end
       end
     end
@@ -194,36 +240,47 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from string" do
         let(:data) { "42" }
+
         it do
           is_asserted_by { subject == 42 }
         end
       end
+
       context "from invalid string" do
         let(:data) { "foobar" }
+
         it do
           is_asserted_by { subject == 0 }
         end
       end
+
       context "from int" do
         let(:data) { 42 }
+
         it do
           is_asserted_by { subject == 42 }
         end
       end
+
       context "from float" do
         let(:data) { 42.195 }
+
         it do
           is_asserted_by { subject == 42 }
         end
       end
+
       context "from boolean" do
         let(:data) { false }
+
         it do
           is_asserted_by { subject == 0 }
         end
       end
+
       context "from nil" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == 0 }
         end
@@ -235,8 +292,9 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from nil" do
         let(:data) { nil }
+
         it do
-          is_asserted_by { subject == nil }
+          is_asserted_by { subject.nil? }
         end
       end
     end
@@ -246,36 +304,47 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from string" do
         let(:data) { "42" }
+
         it do
           is_asserted_by { subject == 42.0 }
         end
       end
+
       context "from invalid string" do
         let(:data) { "foobar" }
+
         it do
           is_asserted_by { subject == 0.0 }
         end
       end
+
       context "from int" do
         let(:data) { 42 }
+
         it do
           is_asserted_by { subject == 42.0 }
         end
       end
+
       context "from float" do
         let(:data) { 42.195 }
+
         it do
           is_asserted_by { subject == 42.195 }
         end
       end
+
       context "from boolean" do
         let(:data) { false }
+
         it do
           is_asserted_by { subject == 0.0 }
         end
       end
+
       context "from nil" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == 0.0 }
         end
@@ -287,8 +356,9 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from nil" do
         let(:data) { nil }
+
         it do
-          is_asserted_by { subject == nil }
+          is_asserted_by { subject.nil? }
         end
       end
     end
@@ -298,18 +368,23 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from int" do
         let(:data) { 42 }
+
         it do
           is_asserted_by { subject == 42.0 }
         end
       end
+
       context "from float" do
         let(:data) { 42.195 }
+
         it do
           is_asserted_by { subject == 42.195 }
         end
       end
+
       context "from nil" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == 0 }
         end
@@ -321,24 +396,31 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from int" do
         let(:data) { 42 }
+
         it do
           is_asserted_by { subject == 42 }
         end
       end
+
       context "from float" do
         let(:data) { 42.195 }
+
         it do
           is_asserted_by { subject == "42.195" }
         end
       end
+
       context "from string" do
         let(:data) { "42.195" }
+
         it do
           is_asserted_by { subject == "42.195" }
         end
       end
+
       context "from nil" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == "" }
         end
@@ -350,24 +432,31 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from int" do
         let(:data) { 42 }
+
         it do
           is_asserted_by { subject == 42 }
         end
       end
+
       context "from float" do
         let(:data) { 42.195 }
+
         it do
           is_asserted_by { subject == 42.195 }
         end
       end
+
       context "from string" do
         let(:data) { "42.195" }
+
         it do
           is_asserted_by { subject == "42.195" }
         end
       end
+
       context "from nil" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == "" }
         end
@@ -422,6 +511,7 @@ RSpec.describe JSON::Schema::Serializer do
             none: 999,
           }
         end
+
         it do
           is_asserted_by { subject == { "name" => "foo", "count" => 2, "obj" => { "baz" => true }, "reqobj"=>{ "baz" => false } } }
         end
@@ -433,6 +523,7 @@ RSpec.describe JSON::Schema::Serializer do
             name: "foo",
           }
         end
+
         it do
           is_asserted_by { subject == { "name" => "foo", "count" => nil, "obj" => nil, "reqobj"=>{ "baz" => false } } }
         end
@@ -459,6 +550,7 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from full" do
         let(:data) { [{a: [1, "2", Stringable.new, nil]}] }
+
         it do
           is_asserted_by { subject == [{"a" => ["1", "2", "Stringable", nil]}] }
         end
@@ -466,6 +558,7 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from partial" do
         let(:data) { [{}] }
+
         it do
           is_asserted_by { subject == [{"a" => nil}] }
         end
@@ -473,6 +566,7 @@ RSpec.describe JSON::Schema::Serializer do
 
       context "from partial 2" do
         let(:data) { nil }
+
         it do
           is_asserted_by { subject == [] }
         end

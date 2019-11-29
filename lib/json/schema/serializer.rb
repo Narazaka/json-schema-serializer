@@ -149,16 +149,13 @@ module JSON
               obj == true
             when "array"
               items_schema = try_hash(schema, :items)
-              obj.nil? ? [] : obj.map {|item| walk(items_schema, item, true) }
+              obj.nil? ? [] : obj.map { |item| walk(items_schema, item, true) }
             when "object"
               properties_schema = try_hash(schema, :properties)
               required_schema = Set.new(try_hash(schema, :required)&.map(&:to_s))
-              properties_schema.map {|name, property_schema|
-                [
-                  name.to_s,
-                  walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s)),
-                ]
-              }.to_h
+              properties_schema.map do |name, property_schema|
+                [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s))]
+              end.to_h
             end
           end
 
