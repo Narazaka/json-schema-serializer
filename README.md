@@ -52,6 +52,10 @@ serializer.serialize({})
 # => {"id"=>0, "name"=>nil, "fuzzy"=>nil}
 # nil -> 0! required property's type coerced!
 
+serializer.serialize({id: 10, name: "I don't need null keys!"}).compact
+# => {"id"=>10, "name"=>"I don't need null keys!"}
+# compact it!
+
 class A
   def id
     42
