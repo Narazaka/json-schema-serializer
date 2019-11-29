@@ -49,7 +49,7 @@ serializer.serialize({id: "42", name: "me"})
 # multiple type auto select!
 
 serializer.serialize({})
-# => {"id"=>0, "name"=>nil}
+# => {"id"=>0, "name"=>nil, "fuzzy"=>nil}
 # nil -> 0! required property's type coerced!
 
 class A
@@ -58,7 +58,7 @@ class A
   end
 end
 serializer.serialize(A.new)
-# => {"id"=>42, "name"=>nil}
+# => {"id"=>42, "name"=>nil, "fuzzy"=>nil}
 # method also allowed
 
 class Schema
