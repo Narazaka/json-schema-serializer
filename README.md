@@ -74,6 +74,44 @@ serializer2 = JSON::Schema::Serializer.new(Schema.new)
 serializer2.serialize(32)
 # => "32"
 # non-hash schema allowed
+
+#
+# object injector allowed!
+#
+
+class FooSerializer
+  def initialize(model)
+    @model = model
+  end
+
+  def first
+    @model.first
+  end
+
+  def count
+    @model.size
+  end
+end
+
+serializer_injected = JSON::Schema::Serializer.new(
+  {
+    type: :object,
+    inject: :Foo,
+    properties: {
+      first: { type: :integer },
+      count: { type: :integer },
+    },
+  },
+  {
+    inject_key: :inject,
+    injectors: {
+      Foo: FooSerializer,
+    },
+  },
+)
+
+serializer_injected.serialize([1, 2, 3])
+# => {"first"=>1, "count"=>3}
 ```
 
 ### Caution
