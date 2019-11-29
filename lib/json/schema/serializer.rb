@@ -19,7 +19,9 @@ module JSON
 
           def walk(schema, obj, required)
             type = try_hash(schema, :type)
+            default = try_hash(schema, :default)
             format = try_hash(schema, :format)
+            obj = default if obj.nil?
             type_coerce(schema, detect_type(type, obj), format, obj, required)
           end
 

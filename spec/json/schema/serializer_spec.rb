@@ -13,6 +13,26 @@ RSpec.describe JSON::Schema::Serializer do
   describe "#serialize" do
     subject { JSON::Schema::Serializer.new(schema).serialize(data) }
 
+    describe "default" do
+      let(:schema) { { type: "string", default: "def" } }
+
+      context "from string" do
+        let(:data) { "foobar" }
+
+        it do
+          is_asserted_by { subject == "foobar" }
+        end
+      end
+
+      context "from null" do
+        let(:data) { nil }
+
+        it do
+          is_asserted_by { subject == "def" }
+        end
+      end
+    end
+
     describe "string" do
       let(:schema) { { type: "string" } }
 
