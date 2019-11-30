@@ -155,8 +155,8 @@ def walk(all, part)
 end
 
 serializer2 = JSON::Schema::Serializer.new(schema["properties"]["bar"], {
-  resolver: ->(schema) do
-    walk(all, JsonRefs.(schema))
+  resolver: ->(part_schema) do
+    walk(JsonRefs.(schema), part_schema))
   end
 })
 ```
