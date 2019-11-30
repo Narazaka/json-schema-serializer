@@ -6,7 +6,7 @@ module JSON
   class Schema
     class Serializer
       def initialize(obj, options = {})
-        @schema = obj
+        @schema = options && options[:resolver] ? options[:resolver].call(obj) : obj
         @options = options
       end
 
@@ -133,6 +133,8 @@ module JSON
                 else
                   obj.to_s
                 end
+              when Regexp
+                obj.inspect.gsub(%r`^/|/[a-z]*$`, '')
               else
                 obj.to_s
               end
