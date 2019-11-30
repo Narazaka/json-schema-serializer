@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.3.0
+
+- add: resolver option to resolve `$ref`
+- mod: regexp to string serialization
+
 ## 1.2.1
 
 - add documentation link

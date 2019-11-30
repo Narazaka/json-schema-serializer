@@ -114,16 +114,16 @@ serializer_injected.serialize([1, 2, 3])
 # => {"first"=>1, "count"=>3}
 ```
 
-### Caution
+### `$ref` resolving
 
 `JSON::Schema::Serializer` does not resolve `$ref` so use external resolver.
 
-with `json_refs` gem example:
+with `hana` and `json_refs` gem example:
 
 ```ruby
+require "hana"
 require "json_refs"
 require "json/schema/serializer"
-
 
 schema = {
   "type" => "object",
@@ -136,6 +136,29 @@ schema = {
 serializer = JSON::Schema::Serializer.new(JsonRefs.(schema))
 serializer.serialize({foo: 0, bar: "42"})
 # => {"foo"=>0, "bar"=>42}
+
+# resolver option also available
+
+def walk(all, part)
+  if part.is_a?(Array)
+    part.map { |item| walk(all, item) }
+  elsif part.is_a?(Hash)
+    ref = part["$ref"] || part[:"$ref"]
+    if ref
+      Hana::Pointer.new(ref[1..-1]).eval(all)
+    else
+      part.map { |k, v| [k, walk(all, v)] }.to_h
+    end
+  else
+    part
+  end
+end
+
+serializer2 = JSON::Schema::Serializer.new(schema["properties"]["bar"], {
+  resolver: ->(schema) do
+    walk(all, JsonRefs.(schema))
+  end
+})
 ```
 
 ## License
