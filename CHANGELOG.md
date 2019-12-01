@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.0
+
+- add: "additionalProperties" support
+
 ## 1.3.0
 
 - add: resolver option to resolve `$ref`
