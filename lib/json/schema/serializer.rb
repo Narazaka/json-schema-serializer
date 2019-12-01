@@ -186,7 +186,7 @@ module JSON
 
           def try_hash(obj, name)
             if obj.respond_to?(:"[]")
-              obj[name] || obj[name.is_a?(Symbol) ? name.to_s : name.to_sym]
+              obj[name] || obj[name.is_a?(String) ? name.to_sym : name.to_s]
             elsif obj.respond_to?(name)
               obj.send(name)
             end
