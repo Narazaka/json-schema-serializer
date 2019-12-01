@@ -121,7 +121,7 @@ module JSON
             when "string"
               case obj
               when nil
-                ""
+                options[:null_through] ? nil : ""
               when DateTime, Date, Time, TimeWithZone
                 case format.to_s
                 when "date-time"
@@ -134,7 +134,7 @@ module JSON
                   obj.to_s
                 end
               when Regexp
-                obj.inspect.gsub(%r`^/|/[a-z]*$`, '')
+                obj.inspect.gsub(%r{^/|/[a-z]*$}, "")
               else
                 obj.to_s
               end
@@ -144,6 +144,10 @@ module JSON
                 1
               when false
                 0
+              when nil
+                options[:null_through] ? nil : 0
+              when ""
+                options[:empty_string_number_coerce_null] ? nil : 0
               else
                 obj.to_i
               end
@@ -153,28 +157,49 @@ module JSON
                 1.0
               when false
                 0.0
+              when nil
+                options[:null_through] ? nil : 0.0
+              when ""
+                options[:empty_string_number_coerce_null] ? nil : 0.0
               else
                 obj.to_f
               end
             when "boolean"
-              obj ? true : false
+              if obj.nil? && options[:null_through]
+                nil
+              elsif options[:empty_string_boolean_coerce_null] && obj == ""
+                nil
+              elsif options[:false_values]
+                !options[:false_values].include?(obj)
+              elsif options[:no_boolean_coerce]
+                obj == true
+              else
+                obj ? true : false
+              end
             when "array"
               items_schema = try_hash(schema, :items)
-              obj.nil? ? [] : obj.map { |item| walk(items_schema, item, true, options) }
+              return options[:null_through] ? nil : [] if obj.nil? || !obj.respond_to?(:map)
+              return options[:null_through] ? nil : [] if options[:guard_primitive_in_structure] && is_primitive?(obj)
+
+              obj.map { |item| walk(items_schema, item, true, options) }
             when "object"
+              return nil if obj.nil? && options[:null_through]
+              return options[:null_through] ? nil : {} if options[:guard_primitive_in_structure] && is_primitive?(obj)
+
               properties_schema = try_hash(schema, :properties)
               additional_properties_schema = try_hash(schema, :additionalProperties)
               required_schema = Set.new(try_hash(schema, :required)&.map(&:to_s))
-              ret = properties_schema.map do |name, property_schema|
-                [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s), options)]
-              end.to_h
+              ret =
+                properties_schema.map do |name, property_schema|
+                  [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s), options)]
+                end.to_h
               if additional_properties_schema
                 not_additional_keys = Set.new(properties_schema.keys.map(&:to_s))
                 additional_keys = obj.keys.reject { |key| not_additional_keys.include?(key.to_s) }
                 ret.merge(
                   additional_keys.map do |name|
                     [name.to_s, walk(additional_properties_schema, try_hash(obj, name), false, options)]
-                  end.to_h
+                  end.to_h,
                 )
               else
                 ret
@@ -189,6 +214,15 @@ module JSON
               obj[name] || obj[name.is_a?(String) ? name.to_sym : name.to_s]
             elsif obj.respond_to?(name)
               obj.send(name)
+            end
+          end
+
+          def is_primitive?(obj)
+            case obj
+            when String, Integer, Float, true, false, nil
+              true
+            else
+              false
             end
           end
         end
