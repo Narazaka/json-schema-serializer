@@ -157,7 +157,7 @@ module JSON
                 obj.to_f
               end
             when "boolean"
-              obj == true
+              obj ? true : false
             when "array"
               items_schema = try_hash(schema, :items)
               obj.nil? ? [] : obj.map { |item| walk(items_schema, item, true, options) }
