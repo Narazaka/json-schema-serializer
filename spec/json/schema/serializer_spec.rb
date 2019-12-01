@@ -413,6 +413,42 @@ RSpec.describe JSON::Schema::Serializer do
       end
     end
 
+    describe "object with additionalProperties" do
+      let(:schema) do
+        {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            count: { type: "integer" },
+          },
+          additionalProperties: {
+            type: "string",
+          },
+          required: %w[name],
+        }
+      end
+
+      context "from full" do
+        let(:data) { { name: "foo", count: "2", str1: "str1", str2: "str2" } }
+
+        it do
+          is_asserted_by do
+            subject == { "name" => "foo", "count" => 2, "str1" => "str1", "str2" => "str2" }
+          end
+        end
+      end
+
+      context "from partial" do
+        let(:data) { { str1: "str1" } }
+
+        it do
+          is_asserted_by do
+            subject == { "name" => "", "count" => nil, "str1" => "str1" }
+          end
+        end
+      end
+    end
+
     describe "array" do
       let(:schema) do
         {

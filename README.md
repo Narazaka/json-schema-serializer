@@ -114,6 +114,12 @@ serializer_injected.serialize([1, 2, 3])
 # => {"first"=>1, "count"=>3}
 ```
 
+### "additionalProperties"
+
+"additionalProperties" is allowed but must be a schema object. (not boolean)
+
+If "additionalProperties" does not exists, this serializer works as `{ additionalProperties": false }`.
+
 ### `$ref` resolving
 
 `JSON::Schema::Serializer` does not resolve `$ref` so use external resolver.

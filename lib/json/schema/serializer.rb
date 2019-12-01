@@ -163,10 +163,22 @@ module JSON
               obj.nil? ? [] : obj.map { |item| walk(items_schema, item, true, options) }
             when "object"
               properties_schema = try_hash(schema, :properties)
+              additional_properties_schema = try_hash(schema, :additionalProperties)
               required_schema = Set.new(try_hash(schema, :required)&.map(&:to_s))
-              properties_schema.map do |name, property_schema|
+              ret = properties_schema.map do |name, property_schema|
                 [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s), options)]
               end.to_h
+              if additional_properties_schema
+                not_additional_keys = Set.new(properties_schema.keys.map(&:to_s))
+                additional_keys = obj.keys.reject { |key| not_additional_keys.include?(key.to_s) }
+                ret.merge(
+                  additional_keys.map do |name|
+                    [name.to_s, walk(additional_properties_schema, try_hash(obj, name), false, options)]
+                  end.to_h
+                )
+              else
+                ret
+              end
             end
           end
 
