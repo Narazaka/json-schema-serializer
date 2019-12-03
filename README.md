@@ -167,6 +167,121 @@ serializer2 = JSON::Schema::Serializer.new(schema["properties"]["bar"], {
 })
 ```
 
+## JSON::Schema::Serializer API
+
+### .new(schema, options = nil)
+
+The initializer.
+
+      # @param schema [any] JSON schema object. The serializer tries schema["type"], schema[:type] and schema.type!
+      # @param options [Hash] options
+      # @option options [Proc] :resolver schema object resolver
+      # @option options [Hashlike<String, Class>] :injectors If schema has inject key, the serializer treats injectors[inject_key].new(data).
+      # @option options [String, Symbol] :inject_key inject key
+      # @option 
+
+#### schema [any]
+
+JSON schema object. The serializer tries schema["type"], schema[:type] and schema.type!
+
+#### options [Hash]
+
+options
+
+#### options[:resolver] [Proc]
+
+schema object `$ref` resolver
+
+#### options[:input_key_transform] [Proc]
+
+input key transform
+
+```ruby
+new({
+  type: :object,
+  properties: {
+    userCount: { type: :integer },
+  },
+}, { input_key_transform: ->(name) { name.underscore } }).serialize({ user_count: 1 }) == { "userCount" => 1 }
+```
+
+#### options[:output_key_transform] [Proc]
+
+output key transform
+
+```ruby
+new({
+  type: :object,
+  properties: {
+    userCount: { type: :integer },
+  },
+}, { output_key_transform: ->(name) { name.underscore } }).serialize({ userCount: 1 }) == { "user_count" => 1 }
+```
+
+#### options[:injectors] [Hashlike<String, Class>, Class], options[:inject_key] [String, Symbol]
+
+If schema has inject key, the serializer treats data by `injectors[inject_key].new(data)` (or `injectors.send(inject_key).new(data)`).
+
+See examples in [Usage](#usage).
+
+#### options[:null_through] [Boolean]
+
+If data is null, always serialize null.
+
+```ruby
+new({ type: :string }, { null_through: true }).serialize(nil) == nil
+```
+
+#### options[:empty_string_number_coerce_null] [Boolean]
+
+If data == "" in integer or number schema, returns nil.
+
+```ruby
+new({ type: :integer }, { empty_string_number_coerce_null: true }).serialize("") == nil
+```
+
+#### options[:empty_string_boolean_coerce_null] [Boolean]
+
+If data == "" in boolean schema, returns nil.
+
+```ruby
+new({ type: :boolean }, { empty_string_boolean_coerce_null: true }).serialize("") == nil
+```
+
+#### options[:false_values] [Enumerable]
+
+If specified, boolean schema treats `!false_values.include?(data)`.
+
+```ruby
+new({ type: :boolean }, { false_values: Set.new([false]) }).serialize(nil) == true
+```
+
+#### options[:no_boolean_coerce] [Boolean]
+
+If true, boolean schema treats only `true` to be `true`.
+
+```ruby
+new({ type: :boolean }, { no_boolean_coerce: true }).serialize(1) == false
+```
+
+#### options[:guard_primitive_in_structure] [Boolean]
+
+If true, array or object schema does not accept primitive data and returns empty value.
+
+
+```ruby
+new({ type: :object }, { guard_primitive_in_structure: true }).serialize(1) == {}
+new({ type: :object }, { guard_primitive_in_structure: true, null_through: true }).serialize(1) == nil
+```
+
+### #serialize(data)
+
+Serialize the object data by the schema.
+
+#### data [any]
+
+Serialize target object. The serializer tries data["foo"], data[:foo] and data.foo!
+
 ## License
 
 Zlib License
