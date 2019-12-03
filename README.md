@@ -173,13 +173,6 @@ serializer2 = JSON::Schema::Serializer.new(schema["properties"]["bar"], {
 
 The initializer.
 
-      # @param schema [any] JSON schema object. The serializer tries schema["type"], schema[:type] and schema.type!
-      # @param options [Hash] options
-      # @option options [Proc] :resolver schema object resolver
-      # @option options [Hashlike<String, Class>] :injectors If schema has inject key, the serializer treats injectors[inject_key].new(data).
-      # @option options [String, Symbol] :inject_key inject key
-      # @option 
-
 #### schema [any]
 
 JSON schema object. The serializer tries schema["type"], schema[:type] and schema.type!
