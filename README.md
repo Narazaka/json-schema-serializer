@@ -116,7 +116,7 @@ serializer_injected.serialize([1, 2, 3])
 
 ### "additionalProperties"
 
-"additionalProperties" is allowed but must be a schema object. (not boolean)
+"additionalProperties" is allowed but must be a schema object or `false`. (not `true`)
 
 If "additionalProperties" does not exists, this serializer works as `{ additionalProperties": false }`.
 
