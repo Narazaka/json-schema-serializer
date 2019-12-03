@@ -5,9 +5,9 @@ require "set"
 module JSON
   class Schema
     class Serializer
-      def initialize(obj, options = {})
+      def initialize(obj, options = nil)
         @schema = options && options[:resolver] ? options[:resolver].call(obj) : obj
-        @options = options
+        @options = options || {}
       end
 
       def serialize(obj)
