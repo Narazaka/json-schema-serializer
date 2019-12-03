@@ -189,16 +189,22 @@ module JSON
               properties_schema = try_hash(schema, :properties)
               additional_properties_schema = try_hash(schema, :additionalProperties)
               required_schema = Set.new(try_hash(schema, :required)&.map(&:to_s))
+              input_key_transform = options[:input_key_transform] # schema key -> input obj key
+              output_key_transform = options[:output_key_transform] # schema key -> out
               ret =
                 properties_schema.map do |name, property_schema|
-                  [name.to_s, walk(property_schema, try_hash(obj, name), required_schema.include?(name.to_s), options)]
+                  input_key = input_key_transform ? input_key_transform.call(name.to_s) : name
+                  output_key = output_key_transform ? output_key_transform.call(name.to_s) : name.to_s
+                  [output_key, walk(property_schema, try_hash(obj, input_key), required_schema.include?(name.to_s), options)]
                 end.to_h
               if additional_properties_schema
-                not_additional_keys = Set.new(properties_schema.keys.map(&:to_s))
+                not_additional_keys_array = properties_schema.keys.map(&:to_s)
+                not_additional_keys = Set.new(input_key_transform ? not_additional_keys_array.map { |k| input_key_transform.call(k) } : not_additional_keys_array)
                 additional_keys = obj.keys.reject { |key| not_additional_keys.include?(key.to_s) }
                 ret.merge(
                   additional_keys.map do |name|
-                    [name.to_s, walk(additional_properties_schema, try_hash(obj, name), false, options)]
+                    output_key = output_key_transform ? output_key_transform.call(name.to_s) : name.to_s
+                    [output_key, walk(additional_properties_schema, try_hash(obj, name), false, options)]
                   end.to_h,
                 )
               else
