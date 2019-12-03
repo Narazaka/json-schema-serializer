@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.0
+
+- add: many options
+
 ## 1.4.0
 
 - add: "additionalProperties" support
