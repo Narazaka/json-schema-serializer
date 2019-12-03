@@ -1,4 +1,4 @@
-# Json::Schema::Serializer
+# JSON::Schema::Serializer
 
 [![Actions Status](https://github.com/Narazaka/json-schema-serializer/workflows/Ruby/badge.svg)](https://github.com/Narazaka/json-schema-serializer/actions)
 [![Gem Version](https://badge.fury.io/rb/json-schema-serializer.svg)](https://badge.fury.io/rb/json-schema-serializer)

@@ -4,7 +4,7 @@ require "json/schema/serializer/version"
 
 Gem::Specification.new do |spec|
   spec.name = "json-schema-serializer"
-  spec.version = Json::Schema::Serializer::VERSION
+  spec.version = JSON::Schema::Serializer::VERSION
   spec.authors = %w[Narazaka]
   spec.email = %w[info@narazaka.net]
   spec.licenses = %w[Zlib]
