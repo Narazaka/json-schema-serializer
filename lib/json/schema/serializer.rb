@@ -189,8 +189,8 @@ module JSON
               properties_schema = try_hash(schema, :properties)
               additional_properties_schema = try_hash(schema, :additionalProperties)
               required_schema = Set.new(try_hash(schema, :required)&.map(&:to_s))
-              input_key_transform = options[:input_key_transform] # schema key -> input obj key
-              output_key_transform = options[:output_key_transform] # schema key -> out
+              input_key_transform = options[:schema_key_transform_for_input] # schema key -> input obj key
+              output_key_transform = options[:schema_key_transform_for_output] # schema key -> out
               ret =
                 properties_schema.map do |name, property_schema|
                   input_key = input_key_transform ? input_key_transform.call(name.to_s) : name

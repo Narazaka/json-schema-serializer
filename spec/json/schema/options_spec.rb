@@ -22,7 +22,7 @@ RSpec.describe JSON::Schema::Serializer do
       it_is_asserted_by { subject == "str" }
     end
 
-    describe :input_key_transform do
+    describe :schema_key_transform_for_input do
       let(:schema) do
         {
           type: :object,
@@ -37,7 +37,7 @@ RSpec.describe JSON::Schema::Serializer do
 
       let(:options) do
         {
-          input_key_transform: ->(name) { name.downcase }
+          schema_key_transform_for_input: ->(name) { name.downcase }
         }
       end
 
@@ -48,7 +48,7 @@ RSpec.describe JSON::Schema::Serializer do
       it_is_asserted_by { subject == { "userCount" => 1, "itemcount" => 2, "propCount" => 3 } }
     end
 
-    describe :output_key_transform do
+    describe :schema_key_transform_for_output do
       let(:schema) do
         {
           type: :object,
@@ -63,7 +63,7 @@ RSpec.describe JSON::Schema::Serializer do
 
       let(:options) do
         {
-          output_key_transform: ->(name) { name.downcase }
+          schema_key_transform_for_output: ->(name) { name.downcase }
         }
       end
 

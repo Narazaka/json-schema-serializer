@@ -185,7 +185,7 @@ options
 
 schema object `$ref` resolver
 
-#### options[:input_key_transform] [Proc]
+#### options[:schema_key_transform_for_input] [Proc]
 
 input key transform
 
@@ -195,10 +195,10 @@ new({
   properties: {
     userCount: { type: :integer },
   },
-}, { input_key_transform: ->(name) { name.underscore } }).serialize({ user_count: 1 }) == { "userCount" => 1 }
+}, { schema_key_transform_for_input: ->(name) { name.underscore } }).serialize({ user_count: 1 }) == { "userCount" => 1 }
 ```
 
-#### options[:output_key_transform] [Proc]
+#### options[:schema_key_transform_for_output] [Proc]
 
 output key transform
 
@@ -208,7 +208,7 @@ new({
   properties: {
     userCount: { type: :integer },
   },
-}, { output_key_transform: ->(name) { name.underscore } }).serialize({ userCount: 1 }) == { "user_count" => 1 }
+}, { schema_key_transform_for_output: ->(name) { name.underscore } }).serialize({ userCount: 1 }) == { "user_count" => 1 }
 ```
 
 #### options[:injectors] [Hashlike<String, Class>, Class], options[:inject_key] [String, Symbol]
