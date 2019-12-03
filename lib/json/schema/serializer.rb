@@ -6,7 +6,7 @@ module JSON
   class Schema
     class Serializer
       def initialize(obj, options = nil)
-        @schema = obj
+        @schema = options && options[:resolver] ? options[:resolver].call(obj) : obj
         @options = options || {}
       end
 
