@@ -5,13 +5,13 @@ require "set"
 module JSON
   class Schema
     class Serializer
-      def initialize(obj, options = nil)
-        @schema = options && options[:resolver] ? options[:resolver].call(obj) : obj
+      def initialize(schema, options = nil)
+        @schema = options && options[:resolver] ? options[:resolver].call(schema) : schema
         @options = options || {}
       end
 
-      def serialize(obj)
-        Walker.walk(@schema, obj, true, @options)
+      def serialize(data)
+        Walker.walk(@schema, data, true, @options)
       end
 
       class Walker
