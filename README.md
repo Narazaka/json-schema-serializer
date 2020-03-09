@@ -217,6 +217,8 @@ If schema has inject key, the serializer treats data by `injectors[inject_key].n
 
 See examples in [Usage](#usage).
 
+CAUTION: In many case you should define the `nil?` method in the injector class because Injector always initialized by `Injector.new(obj)` even if obj == nil.
+
 #### options[:null_through] [Boolean]
 
 If data is null, always serialize null.
