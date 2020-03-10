@@ -112,6 +112,51 @@ serializer_injected = JSON::Schema::Serializer.new(
 
 serializer_injected.serialize([1, 2, 3])
 # => {"first"=>1, "count"=>3}
+
+#
+# object injector with context
+#
+
+class BarSerializer
+  def initialize(model, context = nil)
+    @model = model
+    @context = context
+  end
+
+  def id
+    @model[:id]
+  end
+
+  def score
+    @context[@model[:id]]
+  end
+end
+
+inject_context = {
+  1 => 100,
+  2 => 200,
+}
+
+serializer_injected_with_context = JSON::Schema::Serializer.new(
+  {
+    type: :object,
+    inject: :Bar,
+    properties: {
+      id: { type: :integer },
+      score: { type: :integer },
+    },
+  },
+  {
+    inject_key: :inject,
+    injectors: {
+      Bar: BarSerializer,
+    },
+    inject_context: inject_context,
+  },
+)
+
+serializer_injected_with_context.serialize({ id: 1 })
+# => { "id" => 1, "score" => 100 }
 ```
 
 ### "additionalProperties"
@@ -211,9 +256,11 @@ new({
 }, { schema_key_transform_for_output: ->(name) { name.underscore } }).serialize({ userCount: 1 }) == { "user_count" => 1 }
 ```
 
-#### options[:injectors] [Hashlike<String, Class>, Class], options[:inject_key] [String, Symbol]
+#### options[:injectors] [Hashlike<String, Class>, Class], options[:inject_key] [String, Symbol], options[:inject_context] [any]
 
 If schema has inject key, the serializer treats data by `injectors[inject_key].new(data)` (or `injectors.send(inject_key).new(data)`).
+
+And if `inject_context` is present, `injectors[inject_key].new(data, inject_context)` (or `injectors.send(inject_key).new(data, inject_context)`).
 
 See examples in [Usage](#usage).
 
