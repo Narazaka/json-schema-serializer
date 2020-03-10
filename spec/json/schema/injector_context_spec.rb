@@ -1,5 +1,5 @@
 class InjectWithContext
-  def initialize(model, context = nil)
+  def initialize(model, context = nil) # rubocop:disable Airbnb/OptArgParameters
     @model = model
     @context = context
   end

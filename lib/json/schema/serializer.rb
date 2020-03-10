@@ -5,7 +5,7 @@ require "set"
 module JSON
   class Schema
     class Serializer
-      def initialize(schema, options = nil)
+      def initialize(schema, options = nil) # rubocop:disable Airbnb/OptArgParameters
         @schema = options && options[:resolver] ? options[:resolver].call(schema) : schema
         @options = options || {}
       end

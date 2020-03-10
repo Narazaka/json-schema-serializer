@@ -40,6 +40,7 @@ RSpec.describe JSON::Schema::Serializer do
     end
 
     let(:data) { { data: nil } }
+
     it_is_asserted_by { subject == { "data" => nil } }
   end
 end
