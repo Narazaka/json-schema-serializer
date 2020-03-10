@@ -1,4 +1,8 @@
 require "bundler/setup"
+require "simplecov"
+
+SimpleCov.start
+
 require "json/schema/serializer"
 
 RSpec.configure do |config|
