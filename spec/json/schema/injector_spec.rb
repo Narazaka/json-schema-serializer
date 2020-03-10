@@ -6,6 +6,10 @@ class Inject
   def a
     @model[:b]
   end
+
+  def nil?
+    @model.nil?
+  end
 end
 
 RSpec.describe JSON::Schema::Serializer do
@@ -25,5 +29,17 @@ RSpec.describe JSON::Schema::Serializer do
     let(:schema) { { type: "object", title: "Inject1", properties: { a: { type: "string" } } } }
 
     it_is_asserted_by { subject == { "a" => nil } }
+  end
+
+  context "injected with nil nested" do
+    let(:schema) do
+      {
+        type: "object",
+        properties: { data: { type: "object", injects: "Inject1", properties: { a: { type: "string" } } } },
+      }
+    end
+
+    let(:data) { { data: nil } }
+    it_is_asserted_by { subject == { "data" => nil } }
   end
 end
