@@ -27,7 +27,13 @@ module JSON
             if options[:inject_key]
               inject_key = try_hash(schema, options[:inject_key])
               injector = try_hash(options[:injectors], inject_key) if inject_key
-              obj = injector.new(obj) if injector
+              if injector
+                if options[:inject_context]
+                  obj = injector.new(obj, options[:inject_context])
+                else
+                  obj = injector.new(obj)
+                end
+              end
             end
             type_coerce(schema, detect_type(type, obj), format, obj, required, options)
           end
