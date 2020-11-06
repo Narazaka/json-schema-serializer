@@ -8,7 +8,7 @@ class FoosInject
   end
 
   def map(&block)
-    context = @context.merge(alpha: { 1 => :a, 2 => :b })
+    context = @context.merge(alpha: { "1" => :a, "2" => :b })
     @models.map { |model| block.call(with_context!(model, context)) }
   end
 end
@@ -22,7 +22,7 @@ class FooInject
   end
 
   def bar
-    with_context!(@context.merge(dot: { 1 => '.', 2 => '..' })) do
+    with_context!(@context.merge(dot: { "1" => '.', "2" => '..' })) do
       @model[:bar]
     end
   end
@@ -52,7 +52,7 @@ RSpec.describe JSON::Schema::Serializer do
 
   let(:options) { { inject_key: "injects", injectors: { Foos: FoosInject, Foo: FooInject, Bar: BarInject }, inject_context: inject_context } }
 
-  let(:inject_context) { { slash: { 1 => "/", 2 => "//" } } }
+  let(:inject_context) { { slash: { "1" => "/", "2" => "//" } } }
 
   let(:schema) do
     {
@@ -73,9 +73,13 @@ RSpec.describe JSON::Schema::Serializer do
                     type: "string",
                   },
                 },
+                default: {
+                  hoge: "1",
+                },
               },
               baz: {
                 type: "string",
+                default: "null!",
               },
             },
           },
@@ -89,17 +93,30 @@ RSpec.describe JSON::Schema::Serializer do
       {
         data: {
           bar: {
-            hoge: 1,
+            hoge: "1",
           },
-          baz: 2,
+          baz: "2",
         },
       },
       {
         data: {
           bar: {
-            hoge: 2,
+            hoge: "2",
           },
-          baz: 1,
+          baz: "1",
+        },
+      },
+      {
+        data: {
+          bar: {
+            hoge: "3",
+          },
+          baz: "3",
+        },
+      },
+      {
+        data: {
+          baz: "1",
         },
       },
     ]
@@ -119,6 +136,22 @@ RSpec.describe JSON::Schema::Serializer do
         "data" => {
           "bar" => {
             "hoge" => "// b ..",
+          },
+          "baz" => "/",
+        },
+      },
+      {
+        "data" => {
+          "bar" => {
+            "hoge" => "  ",
+          },
+          "baz" => "null!",
+        },
+      },
+      {
+        "data" => {
+          "bar" => {
+            "hoge" => "1",
           },
           "baz" => "/",
         },
