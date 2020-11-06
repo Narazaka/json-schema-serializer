@@ -157,6 +157,133 @@ serializer_injected_with_context = JSON::Schema::Serializer.new(
 
 serializer_injected_with_context.serialize({ id: 1 })
 # => { "id" => 1, "score" => 100 }
+
+#
+# inject in serializer
+#
+
+class ParentSerializer
+  include JSON::Schema::Serializer::WithContext
+
+  def initialize(model, context = nil)
+    @model = model
+    @context = context
+  end
+
+  def id
+    @model[:id]
+  end
+
+  def score
+    @context[:parent_scores][@model[:id]]
+  end
+
+  def child
+    # it can be
+    # with_context(context) { data }
+    # with_context(data, context)
+    # with_context(data: data, context: context)
+    with_context(@context.merge(child_scores: { 1 => 100, 2 => 200 })) do
+      @model[:child]
+    end
+  end
+end
+
+class ChildSerializer
+  def initialize(model, context = nil)
+    @model = model
+    @context = context
+  end
+
+  def id
+    @model[:id]
+  end
+
+  def score
+    @context[:child_scores][@model[:id]]
+  end
+end
+
+serializer_injected_with_context_in_serializer = JSON::Schema::Serializer.new(
+  {
+    type: :object,
+    inject: :Parent,
+    properties: {
+      id: { type: :integer },
+      score: { type: :integer },
+      child: {
+        type: :object,
+        inject: :Child,
+        properties: {
+          id: { type: :integer },
+          score: { type: :integer },
+        },
+      },
+    },
+  },
+  {
+    inject_key: :inject,
+    injectors: {
+      Parent: ParentSerializer,
+      Child: ChildSerializer,
+    },
+    inject_context: { 1 => 10, 2 => 20 },
+  },
+)
+
+serializer_injected_with_context_in_serializer.serialize({ id: 1, child: { id: 2 } })
+# => { "id" => 1, "score" => 10, "child" => { "id" => 2, "score" => 200 } }
+
+#
+# also you can inject context with arraylike data
+#
+
+class ItemsSerializer
+  include JSON::Schema::Serializer::WithContext
+
+  def initialize(models, context = nil)
+    @models = models
+    @context = context
+  end
+
+  def map(&block)
+    context = (@context || {}).merge(scores: {...})
+    @models.map { |model| block.call(with_context(model, context)) }
+    # CAUTION!
+    # not like below!
+    # with_context(@models.map(&block), context)
+    # with_context(context) { @models.map(&block) }
+  end
+end
+
+#
+# inject model can initialize by keywords
+#
+
+class KeywordSerializer
+  def initialize(data:, context: nil)
+    @data = data
+    @context = context
+  end
+
+  ...
+end
+
+serializer_with_keyword_init_inject = JSON::Schema::Serializer.new(
+  {
+    type: :object,
+    inject: :Keyword,
+    properties: { ... },
+  },
+  {
+    inject_key: :inject,
+    injectors: {
+      Keyword: KeywordSerializer,
+      Child: ChildSerializer,
+    },
+    inject_by_keyword: true, # <- keyword_init!
+  },
+)
 ```
 
 ### "additionalProperties"
@@ -256,11 +383,13 @@ new({
 }, { schema_key_transform_for_output: ->(name) { name.underscore } }).serialize({ userCount: 1 }) == { "user_count" => 1 }
 ```
 
-#### options[:injectors] [Hashlike<String, Class>, Class], options[:inject_key] [String, Symbol], options[:inject_context] [any]
+#### options[:injectors] [Hashlike<String, Class>, Class], options[:inject_key] [String, Symbol], options[:inject_context] [any], options[:inject_by_keyword] [Boolean]
 
 If schema has inject key, the serializer treats data by `injectors[inject_key].new(data)` (or `injectors.send(inject_key).new(data)`).
 
 And if `inject_context` is present, `injectors[inject_key].new(data, inject_context)` (or `injectors.send(inject_key).new(data, inject_context)`).
+
+And if `inject_by_keyword` is true, `new(data, inject_context)` will be `new(data: data, context: inject_context)`.
 
 See examples in [Usage](#usage).
 
@@ -323,6 +452,14 @@ Serialize the object data by the schema.
 #### data [any]
 
 Serialize target object. The serializer tries data["foo"], data[:foo] and data.foo!
+
+## JSON::Schema::Serializer::WithContext API
+
+### #with_context!(data, context), #with_context!(data: data, context: context), #with_context!(context) { data }
+
+If you use `with_context!(data, context)` as the return value of the serializer, then "child" serializer can use that context.
+
+See examples in [Usage](#usage).
 
 ## License
 
