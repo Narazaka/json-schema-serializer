@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.7.0
+
+- add: `with_context!` api
+- add: `:inject_by_keyword` option
+
+## 1.6.0
+
+- add: inject context
+
 ## 1.5.0
 
 - add: many options
