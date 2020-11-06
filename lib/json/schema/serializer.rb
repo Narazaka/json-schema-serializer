@@ -56,9 +56,19 @@ module JSON
               end
               if injector && !using_default
                 if options[:inject_context]
-                  obj = injector.new(obj, options[:inject_context])
+                  obj =
+                    if options[:inject_by_keyword]
+                      injector.new(data: obj, context: options[:inject_context])
+                    else
+                      injector.new(obj, options[:inject_context])
+                    end
                 else
-                  obj = injector.new(obj)
+                  obj =
+                    if options[:inject_by_keyword]
+                      injector.new(data: obj)
+                    else
+                      injector.new(obj)
+                    end
                 end
               end
             end
