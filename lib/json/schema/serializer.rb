@@ -14,6 +14,22 @@ module JSON
         Walker.walk(@schema, data, true, @options)
       end
 
+      DataWithContext = Struct.new(:data, :context, keyword_init: true)
+
+      module WithContext
+        ARG2_NOT_GIVEN = :__json_schema_serializer_arg2_not_given__
+
+        def with_context!(arg1, arg2 = ARG2_NOT_GIVEN) # rubocop:disable Airbnb/OptArgParameters
+          if block_given?
+            DataWithContext.new(data: yield, context: arg1)
+          elsif arg2 == ARG2_NOT_GIVEN
+            DataWithContext.new(arg1)
+          else
+            DataWithContext.new(data: arg1, context: arg2)
+          end
+        end
+      end
+
       class Walker
         class << self
           TimeWithZone = defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : nil
@@ -27,6 +43,10 @@ module JSON
             if options[:inject_key]
               inject_key = try_hash(schema, options[:inject_key])
               injector = try_hash(options[:injectors], inject_key) if inject_key
+              if obj.instance_of?(JSON::Schema::Serializer::DataWithContext)
+                options = options.merge(inject_context: obj.context)
+                obj = obj.data
+              end
               if injector
                 if options[:inject_context]
                   obj = injector.new(obj, options[:inject_context])
