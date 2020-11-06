@@ -11,7 +11,7 @@ module JSON
       end
 
       def serialize(data)
-        Walker.walk(@schema, data, true, @options)
+        Walker.walk(@schema, data, true, false, @options)
       end
 
       DataWithContext = Struct.new(:data, :context, keyword_init: true)
@@ -34,11 +34,14 @@ module JSON
         class << self
           TimeWithZone = defined?(ActiveSupport::TimeWithZone) ? ActiveSupport::TimeWithZone : nil
 
-          def walk(schema, obj, required, options)
+          def walk(schema, obj, required, using_default, options)
             type = try_hash(schema, :type)
             default = try_hash(schema, :default)
             format = try_hash(schema, :format)
-            obj = default if obj.nil?
+            if obj.nil?
+              using_default = true
+              obj = default
+            end
 
             if options[:inject_key]
               inject_key = try_hash(schema, options[:inject_key])
@@ -46,8 +49,12 @@ module JSON
               if obj.instance_of?(JSON::Schema::Serializer::DataWithContext)
                 options = options.merge(inject_context: obj.context)
                 obj = obj.data
+                if obj.nil?
+                  using_default = true
+                  obj = default
+                end
               end
-              if injector
+              if injector && !using_default
                 if options[:inject_context]
                   obj = injector.new(obj, options[:inject_context])
                 else
@@ -55,7 +62,7 @@ module JSON
                 end
               end
             end
-            type_coerce(schema, detect_type(type, obj), format, obj, required, options)
+            type_coerce(schema, detect_type(type, obj), format, obj, required, using_default, options)
           end
 
           def detect_type(type, obj)
@@ -138,7 +145,7 @@ module JSON
             end
           end
 
-          def type_coerce(schema, type, format, obj, required, options)
+          def type_coerce(schema, type, format, obj, required, using_default, options)
             return nil if !required && obj.nil?
 
             case type.to_s
@@ -207,7 +214,7 @@ module JSON
               return options[:null_through] ? nil : [] if obj.nil? || !obj.respond_to?(:map)
               return options[:null_through] ? nil : [] if options[:guard_primitive_in_structure] && is_primitive?(obj)
 
-              obj.map { |item| walk(items_schema, item, true, options) }
+              obj.map { |item| walk(items_schema, item, true, using_default, options) }
             when "object"
               return nil if obj.nil? && options[:null_through]
               return options[:null_through] ? nil : {} if options[:guard_primitive_in_structure] && is_primitive?(obj)
@@ -221,7 +228,7 @@ module JSON
                 properties_schema.map do |name, property_schema|
                   input_key = input_key_transform ? input_key_transform.call(name.to_s) : name
                   output_key = output_key_transform ? output_key_transform.call(name.to_s) : name.to_s
-                  [output_key, walk(property_schema, try_hash(obj, input_key), required_schema.include?(name.to_s), options)]
+                  [output_key, walk(property_schema, try_hash(obj, input_key), required_schema.include?(name.to_s), using_default, options)]
                 end.to_h
               if additional_properties_schema
                 not_additional_keys_array = properties_schema.keys.map(&:to_s)
@@ -230,7 +237,7 @@ module JSON
                 ret.merge(
                   additional_keys.map do |name|
                     output_key = output_key_transform ? output_key_transform.call(name.to_s) : name.to_s
-                    [output_key, walk(additional_properties_schema, try_hash(obj, name), false, options)]
+                    [output_key, walk(additional_properties_schema, try_hash(obj, name), false, using_default, options)]
                   end.to_h,
                 )
               else
@@ -247,6 +254,9 @@ module JSON
             elsif obj.respond_to?(name)
               obj.send(name)
             end
+          rescue
+            p [name, obj]
+            raise
           end
 
           def is_primitive?(obj)

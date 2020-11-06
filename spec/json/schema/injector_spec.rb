@@ -54,6 +54,45 @@ RSpec.describe JSON::Schema::Serializer do
     it_is_asserted_by { subject == { "data" => nil } }
   end
 
+  context "injected with default" do
+    let(:schema) do
+      {
+        type: "object",
+        injects: "Inject1",
+        properties: { a: { type: "string" } },
+        default: {
+          a: 1
+        }
+      }
+    end
+
+    let(:data) { nil }
+
+    it_is_asserted_by { subject == { "a" => "1" } }
+  end
+
+  context "injected nested with default" do
+    let(:schema) do
+      {
+        type: "object",
+        properties: {
+          data: {
+            type: "object",
+            injects: "Inject1",
+            properties: { a: { type: "string" } },
+          },
+        },
+        default: {
+          data: { a: 1 }
+        }
+      }
+    end
+
+    let(:data) { nil }
+
+    it_is_asserted_by { subject == { "data" => { "a" => "1" } } }
+  end
+
   context "injected with array" do
     let(:schema) do
       {
