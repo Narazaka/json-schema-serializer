@@ -1,7 +1,7 @@
 module JSON
   class Schema
     class Serializer
-      VERSION = "2.0.0".freeze
+      VERSION = "2.0.1".freeze
     end
   end
 end
