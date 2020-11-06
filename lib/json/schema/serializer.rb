@@ -264,9 +264,6 @@ module JSON
             elsif obj.respond_to?(name)
               obj.send(name)
             end
-          rescue
-            p [name, obj]
-            raise
           end
 
           def is_primitive?(obj)
