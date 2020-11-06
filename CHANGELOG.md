@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0
+
+- fix: Non-primitive (arrays, objects, etc.) "default" schemas and injections have strange results.
+    - If you were using a non-primitive (array, object, etc.) "default" schema with injection, it could be a breaking change!
+
 ## 1.7.0
 
 - add: `with_context!` api
