@@ -13,7 +13,7 @@ module JSON
       type serializerOptions = {
         inject_key: String | Symbol?,
         inject_context: jsonSchemaContext?,
-        injectors: Hash[String | Symbol, Class] | Class,
+        injectors: Hash[String | Symbol, Class] | Class?,
         inject_by_keyword: bool?,
         resolver: (^(jsonData data) -> jsonData)?,
         null_through: bool?,
