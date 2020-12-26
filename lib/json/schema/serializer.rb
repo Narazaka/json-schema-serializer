@@ -6,7 +6,12 @@ module JSON
   class Schema
     class Serializer
       def initialize(schema, options = nil) # rubocop:disable Airbnb/OptArgParameters
-        @schema = options && options[:resolver] ? options[:resolver].call(schema) : schema
+        @schema =
+          if options && (resolver = options[:resolver])
+            resolver.call(schema)
+          else
+            schema
+          end
         @options = options || {}
       end
 
@@ -212,8 +217,8 @@ module JSON
                 nil
               elsif options[:empty_string_boolean_coerce_null] && obj == ""
                 nil
-              elsif options[:false_values]
-                !options[:false_values].include?(obj)
+              elsif (false_values = options[:false_values])
+                !false_values.include?(obj)
               elsif options[:no_boolean_coerce]
                 obj == true
               else

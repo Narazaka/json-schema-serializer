@@ -1,0 +1,59 @@
+type jsonSchema = untyped
+type jsonData = untyped
+type jsonSchemaContext = untyped
+type jsonSingleType = "null" | "string" | "number" | "integer" | "boolean" | "array" | "object"
+type jsonType = jsonSingleType | Array[jsonSingleType]
+
+# Classes
+module JSON
+  class Schema
+    class Serializer
+      VERSION: String
+
+      type serializerOptions = {
+        inject_key: String | Symbol?,
+        inject_context: jsonSchemaContext?,
+        injectors: Hash[String | Symbol, Class] | Class,
+        inject_by_keyword: bool?,
+        resolver: (^(jsonData data) -> jsonData)?,
+        null_through: bool?,
+        empty_string_number_coerce_null: bool?,
+        empty_string_boolean_coerce_null: bool?,
+        false_values: Enumerable[untyped]?,
+        no_boolean_coerce: bool?,
+        guard_primitive_in_structure: bool?,
+        schema_key_transform_for_input: (^(String name) -> String)?,
+        schema_key_transform_for_output: (^(String name) -> String)?
+      }
+      @schema: jsonSchema
+      @options: serializerOptions
+
+      def initialize: (jsonSchema schema, ?serializerOptions options) -> void
+      def serialize: (jsonData data) -> untyped
+
+      class DataWithContext < Struct[untyped]
+        attr_accessor data(): jsonData
+        attr_accessor context(): jsonSchemaContext
+        def initialize: (data: jsonData, context: jsonSchemaContext) -> void
+      end
+
+      module WithContext
+        ARG2_NOT_GIVEN: :__json_schema_serializer_arg2_not_given__
+
+        def with_context!: (jsonSchemaContext context) { () -> jsonData } -> DataWithContext
+                               | (jsonData data, jsonSchemaContext context) -> DataWithContext
+                               | ({ data: jsonData, context: jsonSchemaContext } arg) -> DataWithContext
+      end
+
+      class Walker
+        TimeWithZone: nil
+
+        def self.walk: (jsonSchema schema, jsonData obj, bool required, bool using_default, serializerOptions options) -> untyped
+        def self.detect_type: (jsonType type_, jsonData obj) -> jsonSingleType
+        def self.type_coerce: (jsonSchema schema, jsonType type_, String format, jsonData obj, bool required, bool using_default, serializerOptions options) -> untyped
+        def self.try_hash: (untyped obj, String | Symbol? name) -> untyped
+        def self.is_primitive?: (untyped obj) -> bool
+      end
+    end
+  end
+end
