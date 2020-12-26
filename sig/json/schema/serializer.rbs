@@ -1,47 +1,33 @@
-class JSON::Schema::Serializer
-  public
+# Classes
+module JSON
+  class Schema
+    class Serializer
+      @schema: untyped
+      @options: Hash[bot, bot]
 
-  def serialize: (untyped data) -> untyped
+      def initialize: (untyped schema, ?nil options) -> Hash[bot, bot]
+      def serialize: (untyped data) -> ((Array[bot] | Float | Hash[bot, bot] | Integer | String | bool)?)
 
-  private
+      class DataWithContext < Struct
+        attr_accessor data(): untyped
+        attr_accessor context(): :__json_schema_serializer_arg2_not_given__
+      end
 
-  def initialize: (untyped schema, ?untyped options) -> untyped
+      module WithContext
+        ARG2_NOT_GIVEN: :__json_schema_serializer_arg2_not_given__
+
+        def with_context!: (untyped arg1, ?:__json_schema_serializer_arg2_not_given__ arg2) -> DataWithContext
+      end
+
+      class Walker
+        TimeWithZone: nil
+
+        def self.walk: (nil schema, nil obj, bool required, bool using_default, Hash[untyped, untyped] options) -> ((Array[bot] | Float | Hash[bot, bot] | Integer | String | bool)?)
+        def self.detect_type: (nil type_, nil obj) -> String?
+        def self.type_coerce: (nil schema, String? type_, nil format, nil obj, bool required, bool using_default, Hash[untyped, untyped] options) -> ((Array[bot] | Float | Hash[bot, bot] | Integer | String | bool)?)
+        def self.try_hash: (nil obj, (:additionalProperties | :default | :format | :items | :properties | :required | :type)? name) -> nil
+        def self.is_primitive?: (nil obj) -> bool
+      end
+    end
+  end
 end
-
-JSON::Schema::Serializer::VERSION: String
-
-class JSON::Schema::Serializer::DataWithContext < Struct[untyped]
-  def self.[]: (*untyped) -> untyped
-
-  def self.inspect: () -> untyped
-
-  def self.members: () -> untyped
-
-  def self.new: (*untyped) -> untyped
-
-  public
-
-  def context: () -> untyped
-
-  def context=: (untyped _) -> untyped
-
-  def data: () -> untyped
-
-  def data=: (untyped _) -> untyped
-end
-
-class JSON::Schema::Serializer::Walker
-  def self.detect_type: (untyped `type`, untyped obj) -> untyped
-
-  def self.type_coerce: (untyped schema, untyped `type`, untyped format, untyped obj, untyped required, untyped using_default, untyped options) -> untyped
-
-  def self.walk: (untyped schema, untyped obj, untyped required, untyped using_default, untyped options) -> untyped
-end
-
-module JSON::Schema::Serializer::WithContext
-  public
-
-  def with_context!: (untyped arg1, ?untyped arg2) -> untyped
-end
-
-JSON::Schema::Serializer::WithContext::ARG2_NOT_GIVEN: Symbol
